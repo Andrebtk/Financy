@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+
+    <style>
+        .styled-table {
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            font-family: sans-serif;
+            min-width: 100%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .styled-table thead tr {
+            color: black;
+            text-align: center;
+        }
+
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
+        }
+
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+
+        .styled-table tbody tr:last-of-type {
+            border-bottom: 2px solid #009879;
+        }
+
+        .styled-table tbody tr.active-row {
+            font-weight: bold;
+            color: #009879;
+        }
+
+
+
+
+    </style>
+
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Shares</th>
+                <th>Type</th>
+                <th>amount</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for x in data %}
+            <tr>
+                <td> {{ x.name }} </td>
+                <td> {{ x.shares }} </td>
+                <td> {{ x.type }} </td>
+                <td> {{ x.amount }} </td>
+                <td> {{ x.time }} </td>
+            </tr>
+           {% endfor %}
+
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}

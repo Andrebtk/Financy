@@ -1,0 +1,5 @@
+requests==2.22.0
+Werkzeug==0.16.1
+cs50==7.0.2
+Flask_Session==0.4.0
+Flask==1.1.1
