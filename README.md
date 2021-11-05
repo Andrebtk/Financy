@@ -6,3 +6,8 @@ Inspired from the CS50 flask project, Financy is a website via which users can â
 ```bash
 pip install -r requirements.txt
 ```
+
+## Usage
+```bash
+flask run
+```
