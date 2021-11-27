@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+
+{% block main %}
+
+
+    {% if value %}
+        <form action="/quote" method="post">
+            <div class="form-group">
+                <input class="form-control" name="symbol" placeholder="lookup any symbol">
+            </div>
+            <button class="btn btn-primary" type="submit">look &#x2191;</button>
+        </form>
+        <br>
+        <p>name: {{  data.name }}</p>
+        <p>price: {{ data.price }}</p>
+        <p>symbol: {{ data.symbol }}</p>
+    {% else %}
+        <form action="/quote" method="post">
+            <div class="form-group">
+                <input class="form-control" name="symbol" placeholder="lookup any symbol">
+            </div>
+            <button class="btn btn-primary" type="submit">look &#x2191;</button>
+        </form>
+    {% endif %}
+
+{% endblock %}
