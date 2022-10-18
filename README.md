@@ -5,7 +5,8 @@ Inspired from the CS50 flask project, Financy is a website via which users can â
 ## Exemple : 
 login : test            
 password : test
-![financy](https://user-images.githubusercontent.com/53980377/140605382-8aea3f05-2dfc-4baf-a0e9-988d1eaa552b.png)
+![financy]<img width="1440" alt="Screenshot 2022-10-19 at 00 01 53" src="https://user-images.githubusercontent.com/53980377/196553688-e68b0946-09ef-4951-a381-5dd185c12688.png">
+
 
 
 
