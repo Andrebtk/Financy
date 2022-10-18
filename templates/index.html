@@ -70,27 +70,38 @@
                 <td> {{ x.symbol }} </td>
                 <td> {{ x.name }} </td>
                 <td> {{ x.shares }} </td>
-                <td> {{ x.price_then }} </td>
-                <td> {{ x.price_now }} </td>
-                <td> {{ x.price_now }} </td>
-                <td> {{ x.p }} </td>
+                <td> {{ x.price_then }} $</td>
+                <td> {{ x.price_now }} $</td>
+                <td> {{ x.price_now }} $</td>
+                {% if x.p < 0 %}
+                    <td style="color: red;"> {{ x.p }} %</td>
+                {% else %}
+                    <td style="color: green;"> {{ x.p }} %</td>
+                {% endif %}
             </tr>
            {% endfor %}
             <tr>
-                <td>Real cash</td>
                 <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
-                <td>{{ data[0].total }} </td>
+                <td></td>
+                <td></td>
             </tr>
+            
             <tr>
-                <td>Cash in stock</td>
                 <td></td>
+                <td>Remaining: {{ data[0].total }} $</td>
                 <td></td>
+                <td> {{ invested }} $</td>
                 <td></td>
-                <td></td>
-                <td>{{ total }} </td>
+                <td>Stock: {{ total }} $</td>
+
+                {% if profit < 0 %}
+                    <td style="color: red;"> {{ profit }} $</td>
+                {% else %}
+                    <td style="color: green;"> {{ profit }} $</td>
+                {% endif %}
             </tr>
         </tbody>
         

@@ -49,6 +49,8 @@ def index():
     index_data = []
     index_data_graph = []
     total=0
+    profit=0
+    invested=0
     names=[]
 
     data = db.execute("select * from purchases where user_id = " + str(session["user_id"]))
@@ -56,13 +58,12 @@ def index():
     data3 = db.execute("select * from stock_history")
     delete = db.execute("select * from purchases where shares = 0 and user_id = " + str(session["user_id"]))
 
-    print("[!] -> " + str(delete))
 
     for x in delete:
         db.execute("delete from purchases where user_id = " + str(session["user_id"]) + " and shares = 0")
 
 
-    print("[>]" + str(data3))
+
 
     if len(data) <1:
         index_data.append({
@@ -98,7 +99,7 @@ def index():
             'shares': data[x]['shares'],
             'price_now': round(z*data[x]['shares'], 3),
             'price_then': round(data[x]['price_per_shares']*data[x]['shares'], 3),
-            'total_line': data[x]['shares']*data[x]['price_per_shares'],
+            'total_line': round(data[x]['shares']*data[x]['price_per_shares'], 3),
             'total': round(data2[0]['cash'], 3),
             'price_per_one': z,
             'p': 0
@@ -107,13 +108,13 @@ def index():
 
         
 
-
-
+        invested+=round(data[x]['price_per_shares']*data[x]['shares'], 3)
+        profit+=round(round(z*data[x]['shares'], 3) - round(data[x]['price_per_shares']*data[x]['shares'], 3), 3)
         total+=round(z*data[x]['shares'], 3)
 
     for x in range(len(index_data)):
         try:
-            index_data[x]['p'] = str(round(((round(index_data[x]['price_now']-index_data[x]['price_then'],2))/index_data[x]['price_then'])*100,2)) + " %"
+            index_data[x]['p'] = round(((round(index_data[x]['price_now']-index_data[x]['price_then'],2))/index_data[x]['price_then'])*100,2)
         except:
             pass
     stock_history = []
@@ -127,8 +128,11 @@ def index():
         if x['company'] == "tsla": stock['tsla'].append(x['stock'])
         if x['company'] == "FB": stock['fb'].append(x['stock'])
         if x['company'] == "AMZN": stock['amzn'].append(x['stock'])
+    
 
-    return render_template("index.html", data=index_data, total=total, names=names, graph=stock)
+
+    print(index_data)
+    return render_template("index.html", data=index_data, total=round(total,3), profit=round(profit, 3), invested=round(invested,3) ,names=names, graph=stock)
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -142,7 +146,6 @@ def buy():
         shares = request.form.get("shares")
 
         already_done = db.execute("select * from purchases where user_id ="+ str(session['user_id']) +" and symbol = '"+ str(symbol) +"'")
-        print("alredy done -> "+ str(already_done))
 
         if already_done != []:
             return apology("You can only have one purchase per stock", 400)
@@ -150,7 +153,6 @@ def buy():
 
         x=lookup(symbol)
 
-        print("[! -> " + str(current_cash) + "  " + str(x['price']))
 
         if x == None:
             return apology("invalid symbol", 400)
@@ -234,7 +236,6 @@ def logout():
 @login_required
 def quote():
     """Get stock quote."""
-    print(session["user_id"])
 
     if request.method == "POST":
         data = lookup(request.form.get("symbol"))
@@ -289,13 +290,21 @@ def sell():
     data = db.execute("select * from purchases where user_id = " + str(session["user_id"]))
     data2 = db.execute("select * from users where id = " + str(session["user_id"]))
     delete = db.execute("select * from purchases where shares = 0 and user_id = " + str(session["user_id"]))
+    z = db.execute("select shares, symbol from purchases where user_id = " + str(session["user_id"]))
+    
 
 
     if request.method == "POST":
         symbol = request.form.get("symbol")
         shares = request.form.get("shares")
 
+        for x in z:
+            if x["symbol"] == symbol:
+                if int(x["shares"]) < int(shares):
+                    return apology("You don't have this many shares")
+
         x = db.execute("select * from purchases where user_id = " + str(session["user_id"]))
+        
 
         y=next(item for item in x if item['symbol'] == symbol)
         
@@ -311,11 +320,11 @@ def sell():
         db.execute("insert into history (user_id, type, amount, time, shares, name) values (?,?,?,?,?,?)",str(session["user_id"]), "sell", str(price_before_sell), str(datetime.now()), str(shares), symbol)
         
         for x in delete:
-            print("[! -> ] " + str(x))
             db.execute("DELETE FROM purchases WHERE shares = 0 AND user_id = " + str(session["user_id"]))
         flash("If there is still a line of zero's with the stock that you just sold please reload the page to make it disappear")
         return redirect("/")
-    return render_template("sell.html", data=data)
+    return render_template("sell.html", data=data, data2=z)
+    
 
 
 def errorhandler(e):

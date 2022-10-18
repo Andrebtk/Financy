@@ -8,7 +8,12 @@
     <form action="/sell" method="post">
         <fieldset>
             <div class="form-group">
-                <input autocomplete="off" autofocus class="form-control" name="symbol" placeholder="Symbol" type="text"/>
+                <!--<input autocomplete="off" autofocus class="form-control" name="symbol" placeholder="Symbol" type="text"/>-->
+                <select class="form-control" name="symbol">
+                    {% for x in data %}
+                        <option value={{ x.symbol }}>{{ x.symbol }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="form-group">
                 <input autocomplete="off" autofocus class="form-control" name="shares" placeholder="Shares" type="text"/>
