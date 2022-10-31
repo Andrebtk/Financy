@@ -8,9 +8,17 @@ from werkzeug.exceptions import default_exceptions, HTTPException, InternalServe
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 
+from datetime import date
+from datetime import timedelta
 
+
+import requests
+import urllib.parse
+import json
 
 from helpers import apology, login_required, lookup, usd
+from collections import OrderedDict
+
 
 # Configure application
 app = Flask(__name__)
@@ -59,6 +67,10 @@ def index():
     delete = db.execute("select * from purchases where shares = 0 and user_id = " + str(session["user_id"]))
 
 
+    
+
+
+    
     for x in delete:
         db.execute("delete from purchases where user_id = " + str(session["user_id"]) + " and shares = 0")
 
@@ -130,10 +142,96 @@ def index():
         if x['company'] == "AMZN": stock['amzn'].append(x['stock'])
     
 
+    dat = date.today()
+    dat = dat - timedelta(days = 1)
+    print(dat)
+
+    doesExist = db.execute("select value from graph where date = '" +  str(dat)+"' and user_id = " + str(session["user_id"]))
+    print(doesExist)
+    if doesExist == []:
+        db.execute("insert into graph (user_id, date, value) values (?,?,?)", str(session["user_id"]),  str(dat), str(index_data[0]['total'] + invested + profit) )
+
+    graph = db.execute("select * from graph where user_id = " + str(session["user_id"]))
+
+    dates = []
+    values = []
+    for i in graph:
+        dates.append(i['Date'])
+        values.append(i['value'])
+
 
     print(index_data)
-    return render_template("index.html", data=index_data, total=round(total,3), profit=round(profit, 3), invested=round(invested,3) ,names=names, graph=stock)
+    return render_template("index.html", data=index_data, total=round(total,3), profit=round(profit, 3), invested=round(invested,3) ,names=names, graph=stock, dates=dates, values=values)
 
+
+@app.route("/predict", methods=["GET", "POST"])
+@login_required
+def predict():
+    
+    if request.method == "POST":
+        timeline = request.form.get('Timeline')
+        if timeline == '30':
+            timeline = 23
+    else:
+        timeline = 6
+
+
+    symbol = request.args.to_dict().get('data')
+    #timeline = request.form['date']
+    print("timeline -> " + str(timeline))
+
+
+
+
+    try:
+        #api_key = os.environ.get("API_KEY")
+        #api_key = "pk_6c70509ce93d4b36b2d416f60ca29a06"
+        api_key = "pk_6bc02c1e81814732a6f5a5d63b96932d"
+
+        #url = "https://cloud.iexapis.com/stable/stock/" + str(symbol) +"/quote?token=" + str(api_key)
+        baseUrl = "https://cloud.iexapis.com/stable/"
+        param = "?token=" + str(api_key)
+
+
+        url = "https://cloud.iexapis.com/time-series/REPORTED_FINANCIALS/AAPL/10-Q?range=1y?token=" + str(api_key)
+        response = requests.get(baseUrl+'stock/'+ str(symbol) +'/chart'+param)
+        response.raise_for_status()
+    except requests.RequestException:
+        print("[error] -> requests.RequestException")
+
+    
+    quote = response.json()
+    
+    
+    data = []
+    final = []
+
+    dates = []
+    values = []
+    i=-1
+
+    print(-(int(timeline)))
+
+    while i > -(int(timeline)):
+        data.append({
+            'closeP': quote[i]['close'],
+            'openP': quote[i]['open'],
+            'date': quote[i]['priceDate'],
+            'changeP': round(quote[i]['close'] - quote[i]['open'], 3)
+        })
+        dates.append(quote[i]['priceDate'])
+        values.append(quote[i]['close'])
+        i=i-1
+        print(i)
+        
+        
+    
+    dates.reverse()
+    values.reverse()
+     
+
+
+    return render_template("predict.html", data=data, dates=dates, values=values, name=symbol, timeline=timeline)
 
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
@@ -172,7 +270,7 @@ def buy():
 
     return render_template("buy.html")
 
-
+'''
 @app.route("/history")
 @login_required
 def history():
@@ -180,7 +278,7 @@ def history():
 
     data = db.execute("select * from history where user_id = " + str(session["user_id"]))
     return render_template("history.html", data=data)
-
+'''
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

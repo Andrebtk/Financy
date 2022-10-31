@@ -8,14 +8,16 @@ db = SQL("sqlite:///finance.db")
 
 
 def main(symbol):
-    try:
-        #api_key = os.environ.get("API_KEY")
-        api_key = "pk_6c70509ce93d4b36b2d416f60ca29a06"
-        url = f"https://cloud.iexapis.com/stable/stock/{urllib.parse.quote_plus(symbol)}/quote?token={api_key}"
-        response = requests.get(url)
-        response.raise_for_status()
+    
+    #api_key = os.environ.get("API_KEY")
+    api_key = "pk_6c70509ce93d4b36b2d416f60ca29a06"
+    url = f"https://cloud.iexapis.com/stable/stock/{urllib.parse.quote_plus(symbol)}/quote?token={api_key}"
+    response = requests.get(url)
+    response.raise_for_status()
+    '''
     except requests.RequestException:
         print("[error] -> requests.RequestException")
+    '''
 
     # Parse response
     try:
