@@ -270,7 +270,7 @@ def buy():
 
     return render_template("buy.html")
 
-'''
+
 @app.route("/history")
 @login_required
 def history():
@@ -278,7 +278,7 @@ def history():
 
     data = db.execute("select * from history where user_id = " + str(session["user_id"]))
     return render_template("history.html", data=data)
-'''
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
