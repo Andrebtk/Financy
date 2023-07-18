@@ -51,7 +51,7 @@ def lookup(symbol):
 
     try:
         #Use your api_key here
-        api_key = "xxxxxxxxxxxxxxxxxxxxxx"
+        api_key = "<YOUR_API_KEY>"
 
         url = f"https://cloud.iexapis.com/stable/stock/{urllib.parse.quote_plus(symbol)}/quote?token={api_key}"
         response = requests.get(url)
